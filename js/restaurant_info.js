@@ -130,6 +130,7 @@ createReviewHTML = (review) => {
   li.appendChild(rating);
 
   const comments = document.createElement('p');
+  comments.setAttribute("id", "comments")
   comments.innerHTML = review.comments;
   li.appendChild(comments);
 
