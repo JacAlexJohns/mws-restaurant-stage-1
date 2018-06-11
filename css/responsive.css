@@ -1,0 +1,51 @@
+#restaurants-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 431px) {
+  nav h1 {
+  	padding: 10px 10px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .inside header #breadcrumb {
+    width: 100%;
+  }
+  .inside #map-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    top: 125px;
+  }
+  .inside #restaurant-container, #reviews-container {
+    width: calc(100% - 80px);
+  }
+  .inside #footer {
+    position: static;
+  }
+}
+
+@media screen and (max-width: 690px) {
+  #restaurants-list li {
+    width: 75%;
+  }
+}
+
+@media screen and (min-width: 691px) {
+  #restaurants-list li {
+    width: 35%;
+  }
+}
+
+@media screen and (min-width: 1158px) {
+  #restaurants-list {
+    width: 1158px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #restaurants-list li {
+    width: 25%;
+  }
+}
