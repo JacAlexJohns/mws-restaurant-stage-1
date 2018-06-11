@@ -34,7 +34,6 @@ fetchNeighborhoods = () => {
     if (error) { // Got an error
       console.error(error);
     } else {
-      console.log(neighborhoods);
       self.neighborhoods = neighborhoods;
       fillNeighborhoodsHTML();
     }
@@ -62,7 +61,6 @@ fetchCuisines = () => {
     if (error) { // Got an error!
       console.error(error);
     } else {
-      console.log(cuisines);
       self.cuisines = cuisines;
       fillCuisinesHTML();
     }
@@ -79,7 +77,6 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
     const option = document.createElement('option');
     option.innerHTML = cuisine;
     option.value = cuisine;
-    option.setAttribute('aria-label', "Cuisine type " + cuisine);
     select.append(option);
   });
 }
@@ -144,7 +141,6 @@ resetRestaurants = (restaurants) => {
   self.markers.forEach(m => m.setMap(null));
   self.markers = [];
   self.restaurants = restaurants;
-  console.log(restaurants);
 }
 
 /**
@@ -153,6 +149,11 @@ resetRestaurants = (restaurants) => {
 fillRestaurantsHTML = (toAddMarkers, restaurants = self.restaurants) => {
   const tabIndex = 0;
   const ul = document.getElementById('restaurants-list');
+  if (restaurants.length === 0) {
+    ul.setAttribute('tabIndex', tabIndex.toString());
+    ul.setAttribute('role', 'contentinfo');
+    ul.setAttribute('aria-label', 'No restaurants displayed, please adjust your filter options');
+  }
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant, tabIndex));
   });

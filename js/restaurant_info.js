@@ -57,8 +57,11 @@ fetchRestaurantFromURL = (callback) => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
+  const tabIndex = 0;
+
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
+  name.setAttribute('tabIndex', tabIndex.toString());
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
@@ -102,9 +105,12 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  * Create all reviews HTML and add them to the webpage.
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+  const tabIndex = 0;
+
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
+  title.setAttribute("tabIndex", tabIndex.toString());
   container.appendChild(title);
 
   if (!reviews) {
