@@ -1,4 +1,4 @@
-const version = 'v13';
+const version = 'v1';
 const rCacheName = `restaurants-${version}`;
 const iCacheName = `restaurants-images-${version}`;
 const allCaches = [
