@@ -33,6 +33,14 @@ fetchRestaurantFromURL = (callback) => {
     error = 'No restaurant id in URL'
     callback(error, null);
   } else {
+    getCachedRestaurant(id).then(function(restaurant) {
+      self.restaurant = restaurant;
+    });
+    if (self.restaurant) {
+      fillRestaurantHTML();
+      callback(null, self.restaurant);
+      return;
+    }
     DBHelper.fetchRestaurantById(id, (error, restaurant) => {
       self.restaurant = restaurant;
       if (!restaurant) {
@@ -49,8 +57,11 @@ fetchRestaurantFromURL = (callback) => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
+  const tabIndex = 0;
+
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
+  name.setAttribute('tabIndex', tabIndex.toString());
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
@@ -94,9 +105,12 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  * Create all reviews HTML and add them to the webpage.
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+  const tabIndex = 0;
+
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
+  title.setAttribute("tabIndex", tabIndex.toString());
   container.appendChild(title);
 
   if (!reviews) {
@@ -161,4 +175,25 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+getCachedRestaurant = (id) => {
+  return getDatabase().then(function(db) {
+    if (!db) return;
+    var os = db.transaction('restaurants').objectStore('restaurants');
+    return os.get(parseInt(id)).then(function(restaurant) {
+      return restaurant;
+    });
+  });
+}
+
+getDatabase = () => {
+  if (!navigator.serviceWorker) {
+    return Promise.resolve();
+  }
+  return dbPromise = idb.open('restaurant', 1, function(upgradeDb) {
+    var store = upgradeDb.createObjectStore('restaurants', {
+      keyPath: 'id'
+    });
+  });
 }
