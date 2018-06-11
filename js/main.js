@@ -79,6 +79,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
     const option = document.createElement('option');
     option.innerHTML = cuisine;
     option.value = cuisine;
+    option.setAttribute('aria-label', "Cuisine type " + cuisine);
     select.append(option);
   });
 }
@@ -150,7 +151,7 @@ resetRestaurants = (restaurants) => {
  * Create all restaurants HTML and add them to the webpage.
  */
 fillRestaurantsHTML = (toAddMarkers, restaurants = self.restaurants) => {
-  const tabIndex = 1;
+  const tabIndex = 0;
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant, tabIndex));
