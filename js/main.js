@@ -1,6 +1,7 @@
 let restaurants,
   neighborhoods,
   cuisines
+var dbPromise
 var map
 var markers = []
 
@@ -8,9 +9,21 @@ var markers = []
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  registerServiceWorker();
+  openDatabase();
   fetchNeighborhoods();
   fetchCuisines();
 });
+
+registerServiceWorker = () => {
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.register('/sw.js').then(function() {
+      console.log('Registration worked!');
+    }).catch(function(error) {
+      console.log('Registration failed!',error);
+    });
+  }
+}
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -20,6 +33,7 @@ fetchNeighborhoods = () => {
     if (error) { // Got an error
       console.error(error);
     } else {
+      console.log(neighborhoods);
       self.neighborhoods = neighborhoods;
       fillNeighborhoodsHTML();
     }
@@ -47,6 +61,7 @@ fetchCuisines = () => {
     if (error) { // Got an error!
       console.error(error);
     } else {
+      console.log(cuisines);
       self.cuisines = cuisines;
       fillCuisinesHTML();
     }
@@ -80,7 +95,7 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-  updateRestaurants();
+  updateRestaurantsCached();
 }
 
 /**
@@ -100,6 +115,14 @@ updateRestaurants = () => {
     if (error) { // Got an error!
       console.error(error);
     } else {
+      this.dbPromise.then(function(db) {
+        if (!db) return;
+        var tx = db.transaction('restaurants', 'readwrite');
+        var store = tx.objectStore('restaurants');
+        restaurants.forEach(function(restaurant) {
+          store.put(restaurant);
+        });
+      });
       resetRestaurants(restaurants);
       fillRestaurantsHTML();
     }
@@ -125,9 +148,10 @@ resetRestaurants = (restaurants) => {
  * Create all restaurants HTML and add them to the webpage.
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
+  const tabIndex = 1;
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
+    ul.append(createRestaurantHTML(restaurant, tabIndex));
   });
   addMarkersToMap();
 }
@@ -135,12 +159,13 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 /**
  * Create restaurant HTML.
  */
-createRestaurantHTML = (restaurant) => {
+createRestaurantHTML = (restaurant, tabIndex) => {
   const li = document.createElement('li');
 
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.alt = restaurant.name + ' Image';
   li.append(image);
 
   const name = document.createElement('h1');
@@ -157,6 +182,9 @@ createRestaurantHTML = (restaurant) => {
 
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
+  console.log("ABC 123");
+  more.setAttribute('tabIndex', tabIndex.toString());
+  more.setAttribute('aria-label', 'View Details for restaurant ' + restaurant.name);
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
 
@@ -174,5 +202,33 @@ addMarkersToMap = (restaurants = self.restaurants) => {
       window.location.href = marker.url
     });
     self.markers.push(marker);
+  });
+}
+
+openDatabase = () => {
+  if (!navigator.serviceWorker) {
+    return Promise.resolve();
+  }
+  this.dbPromise = idb.open('restaurant', 1, function(upgradeDb) {
+    var store = upgradeDb.createObjectStore('restaurants', {
+      keyPath: 'id'
+    });
+  });
+}
+
+showCachedMessages = () => {
+  return this.dbPromise.then(function(db) {
+    if (!db || document.getElementById('restaurants-list').getElementsByTagName('li') > 0) return;
+    var os = db.transaction('restaurants').objectStore('restaurants');
+    return os.getAll().then(function(restaurants) {
+      resetRestaurants(restaurants);
+      fillRestaurantsHTML();
+    });
+  });
+}
+
+updateRestaurantsCached = () => {
+  showCachedMessages().then(function() {
+    updateRestaurants();
   });
 }
