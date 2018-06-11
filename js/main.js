@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   openDatabase();
   fetchNeighborhoods();
   fetchCuisines();
+  updateRestaurantsCached();
 });
 
 registerServiceWorker = () => {
@@ -95,7 +96,7 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-  updateRestaurantsCached();
+  updateRestaurants();
 }
 
 /**
@@ -124,7 +125,7 @@ updateRestaurants = () => {
         });
       });
       resetRestaurants(restaurants);
-      fillRestaurantsHTML();
+      fillRestaurantsHTML(true);
     }
   })
 }
@@ -142,18 +143,19 @@ resetRestaurants = (restaurants) => {
   self.markers.forEach(m => m.setMap(null));
   self.markers = [];
   self.restaurants = restaurants;
+  console.log(restaurants);
 }
 
 /**
  * Create all restaurants HTML and add them to the webpage.
  */
-fillRestaurantsHTML = (restaurants = self.restaurants) => {
+fillRestaurantsHTML = (toAddMarkers, restaurants = self.restaurants) => {
   const tabIndex = 1;
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant, tabIndex));
   });
-  addMarkersToMap();
+  if (toAddMarkers) addMarkersToMap();
 }
 
 /**
@@ -182,7 +184,6 @@ createRestaurantHTML = (restaurant, tabIndex) => {
 
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
-  console.log("ABC 123");
   more.setAttribute('tabIndex', tabIndex.toString());
   more.setAttribute('aria-label', 'View Details for restaurant ' + restaurant.name);
   more.href = DBHelper.urlForRestaurant(restaurant);
@@ -222,7 +223,7 @@ showCachedMessages = () => {
     var os = db.transaction('restaurants').objectStore('restaurants');
     return os.getAll().then(function(restaurants) {
       resetRestaurants(restaurants);
-      fillRestaurantsHTML();
+      fillRestaurantsHTML(false);
     });
   });
 }
