@@ -61,6 +61,7 @@ nav {
   text-align:center;
 }
 nav h1 {
+	width: calc(100% - 50px);
   margin: auto;
 	padding: 25px 10px;
 }
@@ -111,7 +112,7 @@ nav h1 a {
 }
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
-  width: 100%;
+  width: calc(100% - 10px);
   min-height: 75px;
   background-color: #3397DB;
   text-align: center;
@@ -214,7 +215,7 @@ nav h1 a {
 .inside #footer {
   bottom: 0;
   position: absolute;
-  width: 100%;
+  width: calc(100% - 50px);
 }
 #restaurant-name {
   color: #f18200;

@@ -11,7 +11,7 @@
 
 @media screen and (max-width: 800px) {
   .inside header #breadcrumb {
-    width: 100%;
+    width: calc(100% - 80px);
   }
   .inside #map-container {
     position: relative;
