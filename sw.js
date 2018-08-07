@@ -31,15 +31,7 @@ self.addEventListener('install', function(event) {
         'dist/img/icon.png',
         'dist/img/icon-512.png',
         'https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2',
-        'https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmEU9fBBc4AMP6lQ.woff2',
-        'https://maps.googleapis.com/maps/api/js?key=AIzaSyCUt97AVyhtqjH1RVjLkrWYAbIKPzl2qU4&libraries=places&callback=initMap',
-        'https://maps.googleapis.com/maps-api-v3/api/js/33/10/common.js',
-        'https://maps.googleapis.com/maps-api-v3/api/js/33/10/util.js',
-        'https://maps.googleapis.com/maps-api-v3/api/js/33/10/map.js',
-        'https://maps.googleapis.com/maps-api-v3/api/js/33/10/marker.js',
-        'https://maps.googleapis.com/maps-api-v3/api/js/33/10/onion.js',
-        'https://maps.googleapis.com/maps-api-v3/api/js/33/10/controls.js',
-        'https://maps.gstatic.com/mapfiles/transparent.png'
+        'https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmEU9fBBc4AMP6lQ.woff2'
       ]);
     })
   );

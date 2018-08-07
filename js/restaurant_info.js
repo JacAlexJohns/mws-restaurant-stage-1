@@ -181,7 +181,7 @@ getParameterByName = (name, url) => {
 getCachedRestaurant = (id) => {
   return getDatabase().then(function(db) {
     if (!db) return;
-    var os = db.transaction('restaurants').objectStore('restaurants');
+    var os = db.transaction('restaurant').objectStore('restaurants');
     return os.get(parseInt(id)).then(function(restaurant) {
       return restaurant;
     });
@@ -195,6 +195,25 @@ getDatabase = () => {
   return dbPromise = idb.open('restaurant', 1, function(upgradeDb) {
     var store = upgradeDb.createObjectStore('restaurants', {
       keyPath: 'id'
+    });
+  });
+}
+
+getMapDatabase = () => {
+  if (!navigator.serviceWorker) {
+    return Promise.resolve();
+  }
+  return dbPromise = idb.open('map', 1, function(upgradeDb) {
+    var store = upgradeDb.createObjectStore('map');
+  });
+}
+
+getCachedMap = () => {
+  return getMapDatabase().then(function(db) {
+    if (!db) return;
+    var os = db.transaction('map').objectStore('map');
+    return os.get(0).then(function(map) {
+      return map;
     });
   });
 }

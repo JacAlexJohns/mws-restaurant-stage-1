@@ -94,6 +94,13 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
+  // this.dbPromise.then(function(db) {
+  //   if (!db) return;
+  //   console.log(db);
+  //   var tx = db.transaction('map', 'readwrite');
+  //   var store = tx.objectStore('map');
+  //   console.log(store);
+  // });
   updateRestaurants();
 }
 
@@ -208,6 +215,25 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 }
 
+getMapDatabase = () => {
+  if (!navigator.serviceWorker) {
+    return Promise.resolve();
+  }
+  return dbPromise = idb.open('map', 1, function(upgradeDb) {
+    var store = upgradeDb.createObjectStore('map');
+  });
+}
+
+getCachedMap = () => {
+  return getMapDatabase().then(function(db) {
+    if (!db) return;
+    var os = db.transaction('map').objectStore('map');
+    return os.get(0).then(function(map) {
+      return map;
+    });
+  });
+}
+
 openDatabase = () => {
   if (!navigator.serviceWorker) {
     return Promise.resolve();
@@ -216,6 +242,7 @@ openDatabase = () => {
     var store = upgradeDb.createObjectStore('restaurants', {
       keyPath: 'id'
     });
+    var mapStore = upgradeDb.createObjectStore('map');
   });
 }
 
