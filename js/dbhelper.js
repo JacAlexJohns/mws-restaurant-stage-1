@@ -152,7 +152,7 @@ class DBHelper {
   /**
    * Map marker for a restaurant.
    */
-  static mapMarkerForRestaurant(restaurant, map) {
+  static mapMarkerForRestaurant(restaurant, map, dbPromise) {
     const marker = new google.maps.Marker({
       position: restaurant.latlng,
       title: restaurant.name,
@@ -160,6 +160,13 @@ class DBHelper {
       map: map,
       animation: google.maps.Animation.DROP}
     );
+    // dbPromise.then(function(db) {
+    //   console.log("Hello");
+    //   if (!db) return;
+    //   var tx = db.transaction('markers', 'readwrite');
+    //   var store = tx.objectStore('markers');
+    //   store.put(marker);
+    // });
     return marker;
   }
 

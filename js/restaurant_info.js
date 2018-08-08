@@ -5,6 +5,7 @@ var map;
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+  console.log("Blah blah");
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
@@ -25,6 +26,7 @@ window.initMap = () => {
  */
 fetchRestaurantFromURL = (callback) => {
   if (self.restaurant) { // restaurant already fetched!
+    console.log("Baby bottle pops");
     callback(null, self.restaurant)
     return;
   }
@@ -34,6 +36,7 @@ fetchRestaurantFromURL = (callback) => {
     callback(error, null);
   } else {
     getCachedRestaurant(id).then(function(restaurant) {
+      console.log("Hello world", restaurant);
       self.restaurant = restaurant;
     });
     if (self.restaurant) {
@@ -179,10 +182,13 @@ getParameterByName = (name, url) => {
 }
 
 getCachedRestaurant = (id) => {
+  console.log("ID", id);
   return getDatabase().then(function(db) {
     if (!db) return;
-    var os = db.transaction('restaurant').objectStore('restaurants');
+    console.log("DB", db);
+    var os = db.transaction('restaurants').objectStore('restaurants');
     return os.get(parseInt(id)).then(function(restaurant) {
+      console.log("Restaurant", restaurant);
       return restaurant;
     });
   });
@@ -196,24 +202,8 @@ getDatabase = () => {
     var store = upgradeDb.createObjectStore('restaurants', {
       keyPath: 'id'
     });
-  });
-}
-
-getMapDatabase = () => {
-  if (!navigator.serviceWorker) {
-    return Promise.resolve();
-  }
-  return dbPromise = idb.open('map', 1, function(upgradeDb) {
-    var store = upgradeDb.createObjectStore('map');
-  });
-}
-
-getCachedMap = () => {
-  return getMapDatabase().then(function(db) {
-    if (!db) return;
-    var os = db.transaction('map').objectStore('map');
-    return os.get(0).then(function(map) {
-      return map;
+    var markerStore = upgradeDb.createObjectStore('markers', {
+      keyPath: 'title'
     });
   });
 }

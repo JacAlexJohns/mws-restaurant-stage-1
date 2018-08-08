@@ -54,7 +54,7 @@ self.addEventListener('activate', function(event) {
 
 self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url);
-  if (event.request.url.indexOf('https://maps.googleapi.com/js') == 0) {
+  if (event.request.url.indexOf('https://maps.googleapis.com/') == 0) {
     event.respondWith(serveMap(event.request));
     return;
   }

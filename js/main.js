@@ -94,13 +94,6 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-  // this.dbPromise.then(function(db) {
-  //   if (!db) return;
-  //   console.log(db);
-  //   var tx = db.transaction('map', 'readwrite');
-  //   var store = tx.objectStore('map');
-  //   console.log(store);
-  // });
   updateRestaurants();
 }
 
@@ -207,30 +200,11 @@ createRestaurantHTML = (restaurant, tabIndex) => {
 addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
+    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map, this.dbPromise);
     google.maps.event.addListener(marker, 'click', () => {
       window.location.href = marker.url
     });
     self.markers.push(marker);
-  });
-}
-
-getMapDatabase = () => {
-  if (!navigator.serviceWorker) {
-    return Promise.resolve();
-  }
-  return dbPromise = idb.open('map', 1, function(upgradeDb) {
-    var store = upgradeDb.createObjectStore('map');
-  });
-}
-
-getCachedMap = () => {
-  return getMapDatabase().then(function(db) {
-    if (!db) return;
-    var os = db.transaction('map').objectStore('map');
-    return os.get(0).then(function(map) {
-      return map;
-    });
   });
 }
 
@@ -242,7 +216,9 @@ openDatabase = () => {
     var store = upgradeDb.createObjectStore('restaurants', {
       keyPath: 'id'
     });
-    var mapStore = upgradeDb.createObjectStore('map');
+    var markerStore = upgradeDb.createObjectStore('markers', {
+      keyPath: 'title'
+    });
   });
 }
 
