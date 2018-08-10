@@ -14,6 +14,8 @@ self.addEventListener('install', function(event) {
         '/restaurant.html',
         '/js/main.js',
         '/js/restaurant_info.js',
+        '/css/styles.css',
+        '/css/responsive.css',
         '/js/jquery.js',
         '/js/jquery.lazyloadxt.js',
         'dist/css/all.css',
