@@ -5,7 +5,6 @@ var map;
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
-  console.log("Blah blah");
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
@@ -21,12 +20,49 @@ window.initMap = () => {
   });
 }
 
+window.addEventListener("load", function () {
+  const form = document.getElementById("review-add");
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    addReview();
+  });
+
+  addReview = () => {
+    const id = getParameterByName('id');
+    const name = document.getElementById("name-input");
+    const rating = document.getElementById("rating-input");
+    const review = document.getElementById("review-input");
+    form.style.visibility = "hidden";
+    const url = "http://localhost:1337/reviews/";
+    const data = {
+      "restaurant_id": parseInt(id),
+      "name": name.value,
+      "rating": rating.value,
+      "comments": review.value
+    };
+    DBHelper.postData(url, data).then(json => {
+        window.location.reload();
+    });
+  }
+});
+
+addReviewDialog = () => {
+  const form = document.getElementById("review-add");
+  form.style.visibility = "visible";
+}
+
+dismissReviewDialog = () => {
+  const form = document.getElementById("review-add");
+  form.style.visibility = "hidden";
+}
+
 /**
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = (callback) => {
   if (self.restaurant) { // restaurant already fetched!
-    console.log("Baby bottle pops");
     callback(null, self.restaurant)
     return;
   }
@@ -36,7 +72,6 @@ fetchRestaurantFromURL = (callback) => {
     callback(error, null);
   } else {
     getCachedRestaurant(id).then(function(restaurant) {
-      console.log("Hello world", restaurant);
       self.restaurant = restaurant;
     });
     if (self.restaurant) {
@@ -82,7 +117,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  getAndFillReviews(self.restaurant.id);
 }
 
 /**
@@ -103,6 +138,14 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 
     hours.appendChild(row);
   }
+}
+
+getAndFillReviews = (id) => {
+  const reviewsUrl = `http://localhost:1337/reviews/?restaurant_id=${id}`;
+  fetch(reviewsUrl).then(response => response.json()).then(json => {
+    self.restaurant.reviews = json;
+    fillReviewsHTML();
+  });
 }
 
 /**
@@ -140,7 +183,9 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  let d = new Date(review.createdAt);
+  if (!d) d = '';
+  date.innerHTML = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -182,10 +227,8 @@ getParameterByName = (name, url) => {
 }
 
 getCachedRestaurant = (id) => {
-  console.log("ID", id);
   return getDatabase().then(function(db) {
     if (!db) return;
-    console.log("DB", db);
     var os = db.transaction('restaurants').objectStore('restaurants');
     return os.get(parseInt(id)).then(function(restaurant) {
       console.log("Restaurant", restaurant);

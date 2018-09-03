@@ -170,4 +170,17 @@ class DBHelper {
     return marker;
   }
 
+  static postData(url, data) {
+    const headers = new Headers({'Content-Type': 'application/json'});
+    return fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data)
+    })
+    .then(response => {
+      console.log(response);
+      return response.json();
+    });
+  }
+
 }

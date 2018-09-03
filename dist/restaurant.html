@@ -9,7 +9,7 @@
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <!-- Main CSS file -->
   <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/restaurant.css">
   <title>Restaurant Info</title>
 </head>
 
@@ -47,6 +47,9 @@
     <!-- end restaurant -->
     <!-- Beginning reviews -->
     <section id="reviews-container">
+      <div id="add-review-div">
+        <button id="add-review-button" onclick="addReviewDialog()">Add Review</button>
+      </div>
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
@@ -59,14 +62,26 @@
   </footer>
   <!-- End footer -->
 
+  <form id="review-add">
+    <div id="review-form-content">
+      <button id="cancel-review-form" onclick="dismissReviewDialog()">X</button>
+      <h1 id="add-review-title">Add Review</h1>
+      <label for="name-input">Name: </label>
+      <input type="text" name="Name" id="name-input" required="required"><br><br>
+      <label for="rating-input">Rating: </label>
+      <input type="number" name="Rating" id="rating-input" min="0" max="5" required="required"><br><br>
+      <label for="review-input">Review: </label>
+      <br><textarea name="Review" id="review-input" required="required"></textarea><br><br>
+      <input type="submit" name="Submit" value="Submit">
+    </div>
+  </form>
+
   <!-- Beginning scripts -->
   <!-- Database helpers -->
   <!-- IDB Promised from jakearchibald / idb github repo -->
   <script type="application/javascript" src="dist/small.js"></script>
   <!-- Main javascript file -->
   <script type="text/javascript" src="js/restaurant_info.js"></script>
-  <script src="js/jquery.js"></script>
-  <script src="js/jquery.lazyloadxt.js"></script>
   <!-- Google Maps -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUt97AVyhtqjH1RVjLkrWYAbIKPzl2qU4&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
