@@ -52,6 +52,31 @@ self.addEventListener('activate', function(event) {
   );
 });
 
+function serveMap(request) {
+  return caches.open(rCacheName).then(function(cache) {
+    return cache.match(request.url).then(function(response) {
+      if (response) return response;
+      return fetch(request).then(function(networkResponse) {
+        cache.put(request.url, networkResponse.clone());
+        return networkResponse;
+      });
+    });
+  });
+}
+
+function servePhoto(request) {
+  var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
+  return caches.open(iCacheName).then(function(cache) {
+    return cache.match(storageUrl).then(function(response) {
+      if (response) return response;
+      return fetch(request).then(function(networkResponse) {
+        cache.put(storageUrl, networkResponse.clone());
+        return networkResponse;
+      });
+    });
+  });
+}
+
 self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url);
   if (event.request.url.indexOf('https://maps.googleapis.com/') == 0) {
@@ -71,27 +96,29 @@ self.addEventListener('fetch', function(event) {
   );
 });
 
-serveMap = (request) => {
-  return caches.open(rCacheName).then(function(cache) {
-    return cache.match(request.url).then(function(response) {
-      if (response) return response;
-      return fetch(request).then(function(networkResponse) {
-        cache.put(request.url, networkResponse.clone());
-        return networkResponse;
-      });
-    });
-  });
-}
-
-servePhoto = (request) => {
-  var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
-  return caches.open(iCacheName).then(function(cache) {
-    return cache.match(storageUrl).then(function(response) {
-      if (response) return response;
-      return fetch(request).then(function(networkResponse) {
-        cache.put(storageUrl, networkResponse.clone());
-        return networkResponse;
-      });
-    });
-  });
-}
+self.addEventListener('sync', function(event) {
+  if (event.tag == 'review') {
+    event.waitUntil(new Promise((resolve, reject) => {
+      idb.open('restaurant', 1).then(db => {
+        const store = db.transaction('offlineReviews', 'readwrite').objectStore('offlineReviews');
+        store.get('offlineReview').then(review => {
+          const url = 'http://localhost:1337/reviews/';
+          const headers = new Headers({'Content-Type': 'application/json'});
+          fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(review)
+          })
+          .then(response => {
+            const store = db.transaction('offlineReviews', 'readwrite').objectStore('offlineReviews');
+            store.delete('offlineReview');
+          })
+          .then(resolve)
+          .catch(err => {
+            reject(err)
+          });
+        })
+      })
+    }));
+  }
+});

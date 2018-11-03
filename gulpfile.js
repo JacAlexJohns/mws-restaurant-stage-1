@@ -17,7 +17,7 @@ gulp.task('dist', [
 ]);
 
 gulp.task('min-js', function() {
-	gulp.src(['js/dbhelper.js', 'js/idb.js', 'sw.js', 'js/jquery.js', 'js/jquery.lazyloadxt.js'])
+	gulp.src(['js/idb.js', 'js/dbhelper.js', 'sw.js', 'js/jquery.js', 'js/jquery.lazyloadxt.js'])
 		.pipe(concat('small.js'))
 		.pipe(uglify())
 		.pipe(gulp.dest('./dist'));
