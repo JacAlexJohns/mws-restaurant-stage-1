@@ -1,3 +1,6 @@
+const dBase = idb.open('restaurant', 1, function(upgradeDb) {
+  var reviewStore = upgradeDb.createObjectStore('offlineReviews');
+});
 /**
  * Common database helper functions.
  */
@@ -149,6 +152,36 @@ class DBHelper {
     return (`dist/img/${restaurant.photograph}.jpg`);
   }
 
+  static getStarImageForRestaurants(restaurant, callback) {
+    fetch("http://localhost:1337/restaurants/?is_favorite=true")
+      .then(function(response) {
+        return response.json();
+      }).then(function(favorites) {
+        callback(null, favorites);
+      }).catch(function(error) {
+        callback(error, null);
+      });
+  }
+
+  static updateStarImageForRestaurant(restaurant, toStar) {
+    console.log(toStar);
+    if (toStar == 'false') {
+      fetch("http://localhost:1337/restaurants/" + restaurant.id + "/?is_favorite=true", {method : 'PUT'});
+      return DBHelper.starImageUrlForRestaurant();
+    } else {
+      fetch("http://localhost:1337/restaurants/" + restaurant.id + "/?is_favorite=false", {method : 'PUT'});
+      return DBHelper.unstarImageUrlForRestaurant();
+    }
+  }
+
+  static starImageUrlForRestaurant() {
+    return (`dist/img/star.png`)
+  }
+
+  static unstarImageUrlForRestaurant() {
+    return (`dist/img/blank_star.png`)
+  }
+
   /**
    * Map marker for a restaurant.
    */
@@ -180,6 +213,16 @@ class DBHelper {
     .then(response => {
       console.log(response);
       return response.json();
+    })
+    .catch(error => {
+      dBase.then(db => {
+        const store = db.transaction('offlineReviews', 'readwrite').objectStore('offlineReviews');
+        store.put(data, 'offlineReview').then(response => {
+          navigator.serviceWorker.ready.then(registered => {
+            return registered.sync.register('review');
+          });
+        })
+      });
     });
   }
 

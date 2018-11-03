@@ -114,6 +114,7 @@ updateRestaurants = () => {
     if (error) { // Got an error!
       console.error(error);
     } else {
+      console.log(restaurants)
       this.dbPromise.then(function(db) {
         if (!db) return;
         var tx = db.transaction('restaurants', 'readwrite');
@@ -191,7 +192,55 @@ createRestaurantHTML = (restaurant, tabIndex) => {
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
 
+  const favorite = document.createElement('img');
+  favorite.className = 'favorite-img';
+  console.log(restaurant)
+  console.log(restaurant.is_favorite)
+  if (restaurant.is_favorite == 'true') {
+    const star = DBHelper.starImageUrlForRestaurant(restaurant);
+    favorite.setAttribute('data-src', star);
+    favorite.setAttribute('toFavorite', true);
+    favorite.alt = 'Favorite Icon, Marked to Favorite';
+    console.log('A');
+    console.log(star);
+    favorite.src = star;
+  } else {
+    const star = DBHelper.unstarImageUrlForRestaurant(restaurant);
+    favorite.setAttribute('data-src', star);
+    favorite.setAttribute('toFavorite', false);
+    favorite.alt = 'Favorite Icon, Not Marked to Favorite';
+    console.log('B');
+    console.log(star);
+    favorite.src = star;
+  }
+  favorite.onclick = () => {
+    const toStar = favorite.getAttribute('toFavorite');
+    const star = DBHelper.updateStarImageForRestaurant(restaurant, toStar);
+    if (toStar == 'true') {
+      favorite.setAttribute('toFavorite', false);
+      favorite.alt = 'Favorite Icon, Not Marked to Favorite';
+    } else {
+      favorite.setAttribute('toFavorite', true);
+      favorite.alt = 'Favorite Icon, Marked to Favorite';
+    }
+    favorite.setAttribute('data-src', star);
+    favorite.src = star;
+  }
+  li.append(favorite);
+
   return li
+}
+
+toggleFavorite = (favorite, restaurant) => {
+  if (favorite.getAttribute('toFavorite')) {
+    favorite.setAttribute('data-src', DBHelper.unstarImageUrlForRestaurant(restaurant));
+    favorite.setAttribute('toFavorite', false);
+    favorite.alt = 'Favorite Icon, Not Marked to Favorite';
+  } else {
+    favorite.setAttribute('data-src', DBHelper.starImageUrlForRestaurant(restaurant));
+    favorite.setAttribute('toFavorite', true);
+    favorite.alt = 'Favorite Icon, Marked to Favorite';
+  }
 }
 
 /**
