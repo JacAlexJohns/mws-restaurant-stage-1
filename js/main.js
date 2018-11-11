@@ -2,13 +2,15 @@ let restaurants,
   neighborhoods,
   cuisines
 var dbPromise
-var map
+var mapUrl
 var markers = []
+var key = 'AIzaSyCUt97AVyhtqjH1RVjLkrWYAbIKPzl2qU4'
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  addMap();
   registerServiceWorker();
   openDatabase();
   fetchNeighborhoods();
@@ -84,16 +86,23 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
 /**
  * Initialize Google map, called from HTML.
  */
-window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: loc,
-    scrollwheel: false
-  });
+addMap = () => {
+  let mapUrl = 'https://maps.googleapis.com/maps/api/staticmap?';
+  let loc = '40.722216,-73.987501';
+  let zoom = '12';
+  let size = {
+    width: window.innerWidth || document.body.clientWidth,
+    height: 400
+  }
+  mapUrl += 'center=' + loc + '&zoom=' + zoom + '&size=' + size.width + 'x' + size.height + '&';
+  self.mapUrl = mapUrl;
+  mapUrl += 'key=' + self.key;
+  let mapContainer = document.getElementById('map-container');
+  let image = document.createElement('img');
+  image.src = mapUrl;
+  image.alt = 'Map of Restaurant Locations';
+  image.id = 'map';
+  mapContainer.append(image);
   updateRestaurants();
 }
 
@@ -247,28 +256,22 @@ toggleFavorite = (favorite, restaurant) => {
  * Add markers for current restaurants to the map.
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
+  let image = document.getElementById('map');
+  let markers = ''
   restaurants.forEach(restaurant => {
-    // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map, this.dbPromise);
-    google.maps.event.addListener(marker, 'click', () => {
-      window.location.href = marker.url
-    });
-    self.markers.push(marker);
+    const latlng = restaurant.latlng;
+    markers += 'markers=' + latlng.lat + ',' + latlng.lng + '&'
   });
+  let url = self.mapUrl
+  url += markers + 'key=' + self.key;
+  image.src = url;
 }
 
 openDatabase = () => {
   if (!navigator.serviceWorker) {
     return Promise.resolve();
   }
-  this.dbPromise = idb.open('restaurant', 1, function(upgradeDb) {
-    var store = upgradeDb.createObjectStore('restaurants', {
-      keyPath: 'id'
-    });
-    var markerStore = upgradeDb.createObjectStore('markers', {
-      keyPath: 'title'
-    });
-  });
+  this.dbPromise = idb.open('restaurant', 1);
 }
 
 showCachedMessages = () => {

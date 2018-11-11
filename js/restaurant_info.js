@@ -43,7 +43,7 @@ window.addEventListener("load", function () {
       "comments": review.value
     };
     DBHelper.postData(url, data).then(json => {
-        window.location.reload();
+        //window.location.reload();
     });
   }
 });
@@ -241,12 +241,5 @@ getDatabase = () => {
   if (!navigator.serviceWorker) {
     return Promise.resolve();
   }
-  return dbPromise = idb.open('restaurant', 1, function(upgradeDb) {
-    var store = upgradeDb.createObjectStore('restaurants', {
-      keyPath: 'id'
-    });
-    var markerStore = upgradeDb.createObjectStore('markers', {
-      keyPath: 'title'
-    });
-  });
+  return dbPromise = idb.open('restaurant', 1);
 }

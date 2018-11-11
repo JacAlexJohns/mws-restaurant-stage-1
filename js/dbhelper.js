@@ -1,5 +1,7 @@
 const dBase = idb.open('restaurant', 1, function(upgradeDb) {
   var reviewStore = upgradeDb.createObjectStore('offlineReviews');
+  var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+  var markerStore = upgradeDb.createObjectStore('markers', { keyPath: 'title' });
 });
 /**
  * Common database helper functions.
@@ -217,12 +219,15 @@ class DBHelper {
     .catch(error => {
       dBase.then(db => {
         const store = db.transaction('offlineReviews', 'readwrite').objectStore('offlineReviews');
-        store.put(data, 'offlineReview').then(response => {
+        console.log('Blahblahblah' + data);
+        store.put(data, 'offlineReviews').then(response => {
+          console.log('LALALA' + response);
           navigator.serviceWorker.ready.then(registered => {
             return registered.sync.register('review');
           });
         })
       });
+      return null;
     });
   }
 
